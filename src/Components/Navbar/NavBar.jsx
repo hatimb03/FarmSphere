@@ -14,7 +14,6 @@ const NavBar = () => {
       <ul className='hidden md:flex gap-12 '>
         <li className='hover:text-green-300 cursor-pointer'>Home</li>
         <li className='hover:text-green-300 cursor-pointer'>Features</li>
-        <li className='hover:text-green-300 cursor-pointer'>About</li>
         <li className='hover:text-green-300 cursor-pointer'>Contact</li>
       </ul>
 
@@ -39,12 +38,7 @@ const NavBar = () => {
           >
             Features
           </li>
-          <li
-            className='hover:text-green-300 cursor-pointer'
-            onClick={() => setShowMenu(false)}
-          >
-            About
-          </li>
+
           <li
             className='hover:text-green-300 cursor-pointer'
             onClick={() => setShowMenu(false)}

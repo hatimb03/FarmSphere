@@ -7,7 +7,7 @@ const Description = () => {
         </h4>
         <div className=''>
           <div className=''>
-            <p className='text-gray-600 text-sm md:text-base'>
+            <p className='text-gray-600 text-sm md:text-base text-center'>
               Our web application harnesses satellite data to provide farmers
               with valuable insights for their agricultural practices. By
               entering your location, you can access a customized map displaying
