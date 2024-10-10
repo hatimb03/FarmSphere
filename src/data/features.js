@@ -15,7 +15,7 @@ const features = [
     heading: "Location-Based Insights",
     image: "./locationBased.avif",
     description:
-      "Harness the power of geospatial data tailored to your specific location. Receive customized insights on soil conditions, weather patterns, and crop suitability for your area, enabling you to optimize your farming strategies and boost productivity.",
+      "Harness the power of geospatial data tailored to your specific location. Receive customized insights on soil conditions and crop suitability for your area, enabling you to optimize your farming strategies and boost productivity.",
   },
 ];
 

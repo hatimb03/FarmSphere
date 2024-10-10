@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -12,9 +13,15 @@ const NavBar = () => {
 
       {/* Desktop Menu */}
       <ul className='hidden md:flex gap-12 '>
-        <li className='hover:text-green-300 cursor-pointer'>Home</li>
-        <li className='hover:text-green-300 cursor-pointer'>Features</li>
-        <li className='hover:text-green-300 cursor-pointer'>Contact</li>
+        <li className='hover:text-green-300 cursor-pointer'>
+          <Link to='/'>Home</Link>
+        </li>
+        <li className='hover:text-green-300 cursor-pointer'>
+          <Link to='/features'>Featues</Link>
+        </li>
+        <li className='hover:text-green-300 cursor-pointer'>
+          <Link to='/contact'>Contact</Link>
+        </li>
       </ul>
 
       <div className='md:hidden'>
