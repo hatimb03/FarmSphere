@@ -1,10 +1,7 @@
-import NavBar from "../../Components/Navbar/NavBar";
-
 const Contact = () => {
   return (
     <>
-      <NavBar />
-      <div className='bg-green-100 text-green-800 pt-20 text-center pb-20 min-h-[95vh] flex flex-col items-center justify-center'>
+      <div className='bg-green-100 text-green-800 pt-20 text-center pb-20 min-h-[87vh] flex flex-col items-center justify-center'>
         <h2 className='text-center text-3xl mb-8'>Contact Form</h2>
         <form className='mx-auto px-10 w-full sm:w-1/3 md:1/3 lg:1/4 flex flex-col gap-3'>
           <label className='input input-bordered border-green-800 outline-1  flex items-center gap-2 bg-green-100 focus:outline-green-800'>

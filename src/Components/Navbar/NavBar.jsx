@@ -37,20 +37,20 @@ const NavBar = () => {
             className='hover:text-green-300 cursor-pointer'
             onClick={() => setShowMenu(false)}
           >
-            Home
+            <Link to='/'>Home</Link>
           </li>
           <li
             className='hover:text-green-300 cursor-pointer'
             onClick={() => setShowMenu(false)}
           >
-            Features
+            <Link to='/features'>Featues</Link>
           </li>
 
           <li
             className='hover:text-green-300 cursor-pointer'
             onClick={() => setShowMenu(false)}
           >
-            Contact
+            <Link to='/contact'>Contact</Link>
           </li>
         </ul>
       )}

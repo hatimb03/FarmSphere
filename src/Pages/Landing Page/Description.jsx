@@ -1,7 +1,7 @@
 const Description = () => {
   return (
     <>
-      <div className='bg-green-100 lg:px-60 px-16 lg:py-32 py-16 flex flex-col gap-10 justify-center items-center'>
+      <div className='bg-green-100 lg:px-60 px-16 lg:py-32 py-16 flex flex-col gap-10 justify-center items-center w-full'>
         <h4 className='lg:text-4xl text-2xl font-bold text-green-800 text-center  w-full'>
           Smart Farming Starts Here!
         </h4>

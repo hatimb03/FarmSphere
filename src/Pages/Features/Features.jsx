@@ -1,11 +1,9 @@
 import FeatureContainer from "./FeatureContainer";
 import features from "../../data/features";
-import NavBar from "../../Components/Navbar/NavBar";
 
 const Features = () => {
   return (
     <>
-      <NavBar />
       <div className='bg-green-100 text-black py-10 px-12 font-bold'>
         <h4 className='text-center text-3xl mb-10 text-green-800'>Features</h4>
         <div className=' flex justify-center items-center gap-10 flex-col md:flex-row'>
