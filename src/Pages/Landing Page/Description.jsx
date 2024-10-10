@@ -1,4 +1,41 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 const Description = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  // eslint-disable-next-line no-unused-vars
+  const [userCords, setUserCords] = useState({
+    lat: null,
+    long: null,
+  });
+
+  const navigate = useNavigate();
+
+  const getUserLocation = () => {
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (success) => {
+        setUserCords({
+          lat: success.coords.latitude,
+          long: success.coords.longitude,
+        });
+        console.log(success);
+        setLoading(false);
+        navigate("/map", {
+          state: {
+            lat: success.coords.latitude,
+            long: success.coords.longitude,
+          },
+        });
+      },
+      (error) => {
+        setError(error.message);
+        setLoading(false);
+      }
+    );
+  };
+
   return (
     <>
       <div className='bg-green-100 lg:px-60 px-16 lg:py-32 py-16 flex flex-col gap-10 justify-center items-center w-full'>
@@ -19,9 +56,25 @@ const Description = () => {
             </p>
           </div>
         </div>
-        <button className='btn btn-wide bg-transparent text-green-800 hover:bg-green-800 hover:text-white outline-0 hover:border-none'>
-          Get Started
+        <button
+          onClick={() => {
+            getUserLocation();
+          }}
+          className='btn btn-wide bg-transparent text-green-800 hover:bg-green-800 hover:text-white outline-0 hover:border-none'
+        >
+          {loading ? (
+            <span className='loading loading-spinner loading-md'></span>
+          ) : (
+            "Get Started"
+          )}
         </button>
+        {error && (
+          <p className='text-red-600 -mb-4'>
+            *{error}, We need to access your location to give accurate
+            information{" "}
+          </p>
+        )}
+        <p></p>
       </div>
     </>
   );
