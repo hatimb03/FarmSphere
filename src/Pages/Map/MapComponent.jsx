@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -10,6 +10,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import AiAssistant from "./AiAssistant";
+``;
 import axios from "axios";
 
 function SetViewOnMount({ lat, long }) {
@@ -30,8 +31,26 @@ const MapComponent = ({ lat, long }) => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=50`
+          `https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=1000`
         );
+        // console.log(
+        //   res.data.events[0].geometry[0].magnitudeValue +
+        //     res.data.events[0].geometry[0].magnitudeUnit
+        // );
+
+        // const magnitudeUnit = res.data.events.map((disaster) => {
+        //   disaster.geometry.map((item) => {
+        //     console.log(item?.magnitudeUnit);
+        //   });
+        // });
+
+        // const magnitudeValue = res.data.events.map((disaster) => {
+        //   disaster.geometry.map((item) => {
+        //     console.log(item?.magnitudeValue);
+        //   });
+        // });
+
+        // console.log("magnitude", magnitude);
         setEvents(res.data.events);
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -43,6 +62,25 @@ const MapComponent = ({ lat, long }) => {
 
     fetchData();
   }, []);
+
+  const calculateRadius = (magnitudeValue, magnitudeUnit) => {
+    if (!magnitudeValue) return null;
+
+    switch (magnitudeUnit) {
+      case "kts":
+        // Convert knots to meters (1 knot ≈ 0.514444 m/s)
+        // Assuming 1 hour of effect, multiply by 3600 seconds
+        return magnitudeValue * 0.514444 * 3600;
+      case "acres": {
+        // Convert acres to square meters, then calculate radius
+        const squareMeters = magnitudeValue * 4046.86;
+        return Math.sqrt(squareMeters / Math.PI);
+      }
+      default:
+        console.warn(`Unknown magnitude unit: ${magnitudeUnit}`);
+        return null;
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -71,19 +109,49 @@ const MapComponent = ({ lat, long }) => {
         {events.map((event) => {
           const coordinates = event.geometry[0]?.coordinates;
           if (coordinates && coordinates.length >= 2) {
+            const magnitudeValue = event.geometry[0]?.magnitudeValue;
+            const magnitudeUnit = event.geometry[0]?.magnitudeUnit;
+            const radius = calculateRadius(magnitudeValue, magnitudeUnit);
+
             return (
-              <Marker
-                key={event.id}
-                position={[coordinates[1], coordinates[0]]}
-              >
-                <Popup>
-                  <strong>{event.title}</strong>
-                  <br />
-                  Type: {event.categories[0]?.title}
-                  <br />
-                  Date: {new Date(event.geometry[0]?.date).toLocaleDateString()}
-                </Popup>
-              </Marker>
+              <React.Fragment key={event.id}>
+                {radius ? (
+                  <Circle
+                    center={[coordinates[1], coordinates[0]]}
+                    radius={radius}
+                    pathOptions={{
+                      color: "red",
+                      fillColor: "red",
+                      fillOpacity: 0.2,
+                    }}
+                  >
+                    <Popup>
+                      <strong>{event.title}</strong>
+                      <br />
+                      Magnitude: {magnitudeValue} {magnitudeUnit}
+                      <br />
+                      Radius: {(radius / 1000).toFixed(2)} km
+                    </Popup>
+                  </Circle>
+                ) : (
+                  <Circle
+                    center={[coordinates[1], coordinates[0]]}
+                    pathOptions={{
+                      color: "orange",
+                      fillColor: "orange",
+                      fillOpacity: 0.2,
+                    }}
+                  >
+                    <Popup>
+                      <strong>{event.title}</strong>
+                      <br />
+                      {magnitudeValue
+                        ? `Magnitude: ${magnitudeValue} ${magnitudeUnit}`
+                        : "No magnitude data available"}
+                    </Popup>
+                  </Circle>
+                )}
+              </React.Fragment>
             );
           }
           return null;
