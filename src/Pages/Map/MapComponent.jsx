@@ -10,8 +10,8 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import AiAssistant from "./AiAssistant";
-``;
 import axios from "axios";
+import { MdAssistant } from "react-icons/md";
 
 function SetViewOnMount({ lat, long }) {
   const map = useMap();
@@ -21,7 +21,10 @@ function SetViewOnMount({ lat, long }) {
   return null;
 }
 
-const MapComponent = ({ lat, long }) => {
+const MapComponent = () => {
+  const [openAI, setOpenAI] = useState(false);
+  const [lat, setLat] = useState(null);
+  const [long, setLong] = useState(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,11 +32,23 @@ const MapComponent = ({ lat, long }) => {
   const url = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLat(pos.coords.latitude);
+        setLong(pos.coords.longitude);
+      },
+      (err) => {
+        console.error("Error getting location:", err);
+        setError("Unable to retrieve your location.");
+      }
+    );
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const res = await axios.get(url);
-
         setEvents(res.data.events);
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -43,20 +58,20 @@ const MapComponent = ({ lat, long }) => {
       }
     };
 
-    fetchData();
-  }, []);
+    if (lat !== null && long !== null) {
+      fetchData();
+    }
+  }, [lat, long, url]); // Add lat and long as dependencies
 
   const calculateRadius = (magnitudeValue, magnitudeUnit) => {
     if (!magnitudeValue) return null;
 
     switch (magnitudeUnit) {
       case "kts":
-        // Convert knots to meters
-        return magnitudeValue * 0.514444 * 3600;
+        return magnitudeValue * 0.514444 * 3600; // Convert knots to meters
       case "acres": {
-        // Convert acres to square meters, then calculating radius
-        const squareMeters = magnitudeValue * 4046.86;
-        return Math.sqrt(squareMeters / Math.PI);
+        const squareMeters = magnitudeValue * 4046.86; // Convert acres to square meters
+        return Math.sqrt(squareMeters / Math.PI); // Calculate radius
       }
       default:
         console.warn(`Unknown magnitude unit: ${magnitudeUnit}`);
@@ -72,8 +87,12 @@ const MapComponent = ({ lat, long }) => {
     return <div>Error: {error}</div>;
   }
 
+  if (lat === null || long === null) {
+    return <div>Please allow location access.</div>; // Handling case where location is not available
+  }
+
   return (
-    <div className='w-full h-[87vh] relative'>
+    <div className='w-full h-[87vh] relative z-[2000]'>
       <MapContainer
         center={[lat, long]}
         zoom={4}
@@ -98,51 +117,49 @@ const MapComponent = ({ lat, long }) => {
 
             return (
               <React.Fragment key={event.id}>
-                {radius ? (
-                  <Circle
-                    center={[coordinates[1], coordinates[0]]}
-                    radius={radius}
-                    pathOptions={{
-                      color: "red",
-                      fillColor: "red",
-                      fillOpacity: 0.2,
-                    }}
-                  >
-                    <Popup>
-                      <strong>{event.title}</strong>
-                      <br />
-                      Magnitude: {magnitudeValue} {magnitudeUnit}
-                      <br />
-                      Radius: {(radius / 1000).toFixed(2)} km
-                    </Popup>
-                  </Circle>
-                ) : (
-                  <Circle
-                    center={[coordinates[1], coordinates[0]]}
-                    pathOptions={{
-                      color: "orange",
-                      fillColor: "orange",
-                      fillOpacity: 0.2,
-                    }}
-                  >
-                    <Popup>
-                      <strong>{event.title}</strong>
-                      <br />
-                      {magnitudeValue
-                        ? `Magnitude: ${magnitudeValue} ${magnitudeUnit}`
-                        : "No magnitude data available"}
-                    </Popup>
-                  </Circle>
-                )}
+                <Circle
+                  center={[coordinates[1], coordinates[0]]}
+                  radius={radius || 0} // Fallback to 0 if radius is null
+                  pathOptions={{
+                    color: radius ? "red" : "orange",
+                    fillColor: radius ? "red" : "orange",
+                    fillOpacity: 0.2,
+                  }}
+                >
+                  <Popup>
+                    <strong>{event.title}</strong>
+                    <br />
+                    {radius ? (
+                      <>
+                        Magnitude: {magnitudeValue} {magnitudeUnit}
+                        <br />
+                        Radius: {(radius / 1000).toFixed(2)} km
+                      </>
+                    ) : (
+                      `Magnitude: ${
+                        magnitudeValue || "No magnitude data available"
+                      } ${magnitudeUnit}`
+                    )}
+                  </Popup>
+                </Circle>
               </React.Fragment>
             );
           }
           return null;
         })}
       </MapContainer>
-      <div className='absolute top-[100px] right-8 z-[1000] w-3/4 sm:w-1/2  rounded-sm p-2  overflow-auto h-[60vh]'>
-        <AiAssistant />
-      </div>
+      <MdAssistant
+        style={{ transition: "transform 0.3s ease" }}
+        className={`text-green-800 text-4xl absolute right-0 top-[100px] z-[1000] ${
+          openAI ? "rotate-90" : "-rotate-90"
+        }`}
+        onClick={() => setOpenAI(!openAI)}
+      />
+      {openAI && (
+        <div className='absolute top-[100px] right-8 z-[1000] w-3/4 sm:w-1/2 rounded-sm p-2 overflow-auto h-[60vh]'>
+          <AiAssistant isOpen={openAI} />
+        </div>
+      )}
     </div>
   );
 };
