@@ -8,7 +8,7 @@ import Map from "./Pages/Map/Map";
 
 const App = () => {
   return (
-    <>
+    <div className='relative'>
       <BrowserRouter>
         <NavBar />
         <Routes>
@@ -19,8 +19,8 @@ const App = () => {
           <Route path='*' element={<LandingPage />} />
         </Routes>
       </BrowserRouter>
-      <Footer />
-    </>
+      <Footer className='fixed bottom-0' />
+    </div>
   );
 };
 

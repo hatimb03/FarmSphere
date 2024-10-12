@@ -26,31 +26,14 @@ const MapComponent = ({ lat, long }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const url = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=1000`
-        );
-        // console.log(
-        //   res.data.events[0].geometry[0].magnitudeValue +
-        //     res.data.events[0].geometry[0].magnitudeUnit
-        // );
+        const res = await axios.get(url);
 
-        // const magnitudeUnit = res.data.events.map((disaster) => {
-        //   disaster.geometry.map((item) => {
-        //     console.log(item?.magnitudeUnit);
-        //   });
-        // });
-
-        // const magnitudeValue = res.data.events.map((disaster) => {
-        //   disaster.geometry.map((item) => {
-        //     console.log(item?.magnitudeValue);
-        //   });
-        // });
-
-        // console.log("magnitude", magnitude);
         setEvents(res.data.events);
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -68,11 +51,10 @@ const MapComponent = ({ lat, long }) => {
 
     switch (magnitudeUnit) {
       case "kts":
-        // Convert knots to meters (1 knot ≈ 0.514444 m/s)
-        // Assuming 1 hour of effect, multiply by 3600 seconds
+        // Convert knots to meters
         return magnitudeValue * 0.514444 * 3600;
       case "acres": {
-        // Convert acres to square meters, then calculate radius
+        // Convert acres to square meters, then calculating radius
         const squareMeters = magnitudeValue * 4046.86;
         return Math.sqrt(squareMeters / Math.PI);
       }
@@ -95,6 +77,7 @@ const MapComponent = ({ lat, long }) => {
       <MapContainer
         center={[lat, long]}
         zoom={4}
+        minZoom={3}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
       >
@@ -157,7 +140,7 @@ const MapComponent = ({ lat, long }) => {
           return null;
         })}
       </MapContainer>
-      <div className='absolute top-[100px] right-0 z-[1000] w-1/2 max-w-md rounded-sm p-2 min-h-2/3'>
+      <div className='absolute top-[100px] right-8 z-[1000] w-3/4 sm:w-1/2  rounded-sm p-2  overflow-auto h-[60vh]'>
         <AiAssistant />
       </div>
     </div>
